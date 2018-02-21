@@ -65,7 +65,7 @@ def desRound(text, subkey):
 
 # Description: Takes in two 64-bit numbers (as plaintext and key)
 #              and applies the DEA. Returns the encrypted text.
-def des(plaintext, key, decrypt = False, rounds = 16):
+def encrypt(plaintext, key, rounds = 16, decrypt = False):
     # Get key schedule
     subkeys = keySchedule(key, rounds, decrypt)
 
@@ -79,3 +79,28 @@ def des(plaintext, key, decrypt = False, rounds = 16):
     #Flip and Inverse Initial Permutation
     ciphertext = ((ciphertext & 0xffffffff) << 32) | (ciphertext >> 32)
     return permute(ciphertext, app.oIP)
+
+
+# Description: Same algorithm as encryption but with reversed
+#              key schedule. Placed in its own function for
+#              convenience and clarity purposes.
+def decrypt(ciphertext, key, rounds = 16):
+    return encrypt(ciphertext, key, rounds, True)
+
+
+# Description: Takes in two 64 bits numbers (as plaintext and key)
+#              and applies triple DES using the scheme:
+#              encrypt(decrypt(encrypt))
+# Note:        As triple DES can be performed with either two or
+#              three keys, key3 defaults to key1 in the case that
+#              only two keys are given.
+def tripleEncrypt(plaintext, key1, key2, key3 = False):
+    if(not key3): key3 = key1
+    return encrypt(decrypt(encrypt(plaintext, key1), key2), key3)
+
+
+# Description: Same algorithm as tripleEncrypt but with the scheme:
+#              decrypt(encrypt(decrypt))
+def tripleDecrypt(ciphertext, key1, key2, key3 = False):
+    if(not key3): key3 = key1
+    return decrypt(encrypt(decrypt(plaintext, key3), key2), key1) 
