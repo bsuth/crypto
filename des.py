@@ -32,10 +32,7 @@ def keySchedule(key, rounds, decrypt):
         subkeys.append(permute(key, app.PC2))
 
     # Reverse key schedule if decrypting
-    if(decrypt):
-        subkeys.reverse()
-
-    return subkeys
+    return subkeys[::-1] if decrypt else subkeys
 
 
 # Description: Returns text after one round of DES
@@ -68,10 +65,10 @@ def desRound(text, subkey):
 
 # Description: Takes in two 64-bit numbers (as plaintext and key)
 #              and applies the DEA. Returns the encrypted text.
-def des(plaintext, key, rounds = 16, decrypt = False):
+def des(plaintext, key, decrypt = False, rounds = 16):
     # Get key schedule
     subkeys = keySchedule(key, rounds, decrypt)
- 
+
     #Initial Permutation
     ciphertext = permute(plaintext, app.IP)
 
